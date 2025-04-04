@@ -99,16 +99,16 @@ for i, post in enumerate(posts):
     with current_col:
         with st.container():
             # Create a card-like container with improved styling
-            html_template = f'''<div style='background-color: var(--background-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid rgba(49, 51, 63, 0.2); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);'>
+            html_template = f'''<div style='background-color: var(--st-background-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid var(--st-border-color); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);'>
             <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;'>
-                <h3 style='margin: 0; color: var(--text-color); font-size: 1.2rem; font-weight: 600;'>📝 Post {post['id']}</h3>
-                <span style='background-color: {('#10B981' if post['status'].lower() == 'completed' else '#3B82F6')}; color: white; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.875rem; font-weight: 500;'>{post['status'].upper()}</span>
+                <h3 style='margin: 0; color: var(--st-color-primary); font-size: 1.2rem; font-weight: 600;'>📝 Post {post['id']}</h3>
+                <span style='background-color: {('var(--st-color-success)' if post['status'].lower() == 'completed' else 'var(--st-color-primary)')}; color: white; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.875rem; font-weight: 500;'>{post['status'].upper()}</span>
             </div>
             <div style='margin-bottom: 1rem;'>
-                <strong style='color: var(--text-color); font-size: 0.875rem;'>Title</strong>
-                <div style='font-size: 1.1rem; margin-top: 0.5rem; color: var(--text-color); font-weight: 500;'>{post.get('title', 'Untitled')}</div>
+                <strong style='color: var(--st-color-header); font-size: 0.875rem;'>Title</strong>
+                <div style='font-size: 1.1rem; margin-top: 0.5rem; color: var(--st-color-header); font-weight: 500;'>{post.get('title', 'Untitled')}</div>
             </div>
-            <div style='background-color: rgba(49, 51, 63, 0.05); border-radius: 8px; padding: 1rem; color: var(--text-color); font-size: 1rem; line-height: 1.5;'>
+            <div style='background-color: var(--st-background-secondary); border-radius: 8px; padding: 1rem; color: var(--st-color-content); font-size: 1rem; line-height: 1.5;'>
                 {post['content'].replace('\n', '<br>')}
             </div>
         </div>'''
