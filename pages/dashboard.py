@@ -91,6 +91,21 @@ if posts:
     )
     st.divider()
 
+# Define HTML template outside the loop
+post_template = '''<div style='background-color: var(--st-background-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid var(--st-border-color); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);'>
+    <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;'>
+        <h3 style='margin: 0; color: var(--st-color-primary); font-size: 1.2rem; font-weight: 600;'>📝 Post {post_id}</h3>
+        <span style='background-color: {status_color}; color: white; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.875rem; font-weight: 500;'>{status}</span>
+    </div>
+    <div style='margin-bottom: 1rem;'>
+        <strong style='color: var(--st-color-header); font-size: 0.875rem;'>Title</strong>
+        <div style='font-size: 1.1rem; margin-top: 0.5rem; color: var(--st-color-header); font-weight: 500;'>{title}</div>
+    </div>
+    <div style='background-color: var(--st-background-secondary); border-radius: 8px; padding: 1rem; color: var(--st-color-content); font-size: 1rem; line-height: 1.5;'>
+        {content}
+    </div>
+</div>'''
+
 # Display posts in a grid layout
 col1, col2 = st.columns(2)
 current_col = col1
@@ -98,29 +113,24 @@ current_col = col1
 for i, post in enumerate(posts):
     with current_col:
         with st.container():
-            # Safely preprocess content outside the f-string
+            # Prepare the template variables
             content_html = post['content'].replace('\n', '<br>')
             status_color = (
                 "var(--st-color-success)"
                 if post['status'].lower() == 'completed'
                 else "var(--st-color-primary)"
             )
-
-            html_template = f"""<div style='background-color: var(--st-background-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid var(--st-border-color); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);'>
-            <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;'>
-                <h3 style='margin: 0; color: var(--st-color-primary); font-size: 1.2rem; font-weight: 600;'>📝 Post {post['id']}</h3>
-                <span style='background-color: {status_color}; color: white; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.875rem; font-weight: 500;'>{post['status'].upper()}</span>
-            </div>
-            <div style='margin-bottom: 1rem;'>
-                <strong style='color: var(--st-color-header); font-size: 0.875rem;'>Title</strong>
-                <div style='font-size: 1.1rem; margin-top: 0.5rem; color: var(--st-color-header); font-weight: 500;'>{post.get('title', 'Untitled')}</div>
-            </div>
-            <div style='background-color: var(--st-background-secondary); border-radius: 8px; padding: 1rem; color: var(--st-color-content); font-size: 1rem; line-height: 1.5;'>
-                {content_html}
-            </div>
-        </div>"""
-
-            st.markdown(html_template, unsafe_allow_html=True)
+            
+            # Format the HTML template with the variables
+            formatted_html = post_template.format(
+                post_id=post['id'],
+                status_color=status_color,
+                status=post['status'].upper(),
+                title=post.get('title', 'Untitled'),
+                content=content_html
+            )
+            
+            st.markdown(formatted_html, unsafe_allow_html=True)
         
         # Alternate columns
         current_col = col2 if current_col == col1 else col1
