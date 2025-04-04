@@ -23,14 +23,31 @@ campaign_id = campaign_dict[selected_label]
 # Add delete button with confirmation
 col1, col2 = st.columns([3, 1])
 with col2:
-    if st.button("🗑️ Delete Campaign", type="secondary", use_container_width=True):
-        if st.button("⚠️ Confirm Delete", type="primary", use_container_width=True):
-            delete_res = requests.delete(f"{API_BASE}/campaigns/{campaign_id}")
-            if delete_res.status_code == 200:
-                st.success("✅ Campaign deleted successfully!")
+    # Initialize session state for delete confirmation
+    if 'delete_confirmation' not in st.session_state:
+        st.session_state.delete_confirmation = False
+    
+    # Show delete button or confirmation dialog
+    if not st.session_state.delete_confirmation:
+        if st.button("🗑️ Delete Campaign", type="secondary", use_container_width=True):
+            st.session_state.delete_confirmation = True
+            st.rerun()
+    else:
+        st.warning("⚠️ Are you sure you want to delete this campaign?")
+        col3, col4 = st.columns(2)
+        with col3:
+            if st.button("✅ Yes, Delete", type="primary", use_container_width=True):
+                delete_res = requests.delete(f"{API_BASE}/campaigns/{campaign_id}")
+                if delete_res.status_code == 200:
+                    st.success("Campaign deleted successfully!")
+                    st.session_state.delete_confirmation = False
+                    st.rerun()
+                else:
+                    st.error("Failed to delete campaign")
+        with col4:
+            if st.button("❌ Cancel", type="secondary", use_container_width=True):
+                st.session_state.delete_confirmation = False
                 st.rerun()
-            else:
-                st.error("❌ Failed to delete campaign")
 
 # --- View Themes ---
 st.header("Ý tưởng cho Pages")
@@ -81,18 +98,18 @@ current_col = col1
 for i, post in enumerate(posts):
     with current_col:
         with st.container():
-            # Create a card-like container with custom styling
+            # Create a card-like container with improved styling
             st.markdown(f"""
-                <div style='background-color: var(--background-color); border-radius: 10px; padding: 20px; margin-bottom: 20px; border: 2px solid var(--primary-color);'>
-                    <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;'>
-                        <h3 style='margin: 0; color: var(--text-color);'>📝 Post {post['id']}</h3>
-                        <span style='background-color: {('#10B981' if post['status'].lower() == 'completed' else '#3B82F6')}; color: white; padding: 5px 10px; border-radius: 15px; font-size: 0.8em;'>{post['status'].upper()}</span>
+                <div style='background-color: var(--background-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid rgba(49, 51, 63, 0.2); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);'>
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;'>
+                        <h3 style='margin: 0; color: var(--text-color); font-size: 1.2rem; font-weight: 600;'>📝 Post {post['id']}</h3>
+                        <span style='background-color: {('#10B981' if post['status'].lower() == 'completed' else '#3B82F6')}; color: white; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.875rem; font-weight: 500;'>{post['status'].upper()}</span>
                     </div>
-                    <div style='margin-bottom: 15px;'>
-                        <strong style='color: var(--text-color);'>Title:</strong>
-                        <div style='font-size: 1.1em; margin-top: 5px; color: var(--text-color);'>{post.get('title', 'Untitled')}</div>
+                    <div style='margin-bottom: 1rem;'>
+                        <strong style='color: var(--text-color); font-size: 0.875rem;'>Title</strong>
+                        <div style='font-size: 1.1rem; margin-top: 0.5rem; color: var(--text-color); font-weight: 500;'>{post.get('title', 'Untitled')}</div>
                     </div>
-                    <div style='background-color: var(--background-color); border: 1px solid var(--primary-color); border-radius: 5px; padding: 15px; margin-bottom: 10px; color: var(--text-color);'>
+                    <div style='background-color: rgba(49, 51, 63, 0.05); border-radius: 8px; padding: 1rem; color: var(--text-color); font-size: 1rem; line-height: 1.5;'>
                         {post['content'].replace('\n', '<br>')}
                     </div>
                 </div>
