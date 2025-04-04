@@ -74,11 +74,29 @@ if posts:
     )
     st.divider()
 
-# Display posts
-for post in posts:
-    with st.container():
-        st.markdown(f"### 📝 Post {post['id']}")
-        st.markdown(f"**Title:** {post.get('title', 'Untitled')}")
-        st.text_area("Content", value=post['content'], height=150, key=f"content_{post['id']}", disabled=True)
-        st.markdown(f"**Status:** `{post['status']}`")
-        st.divider()
+# Display posts in a grid layout
+col1, col2 = st.columns(2)
+current_col = col1
+
+for i, post in enumerate(posts):
+    with current_col:
+        with st.container():
+            # Create a card-like container with custom styling
+            st.markdown(f"""
+                <div style='background-color: var(--background-color); border-radius: 10px; padding: 20px; margin-bottom: 20px; border: 2px solid var(--primary-color);'>
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;'>
+                        <h3 style='margin: 0; color: var(--text-color);'>📝 Post {post['id']}</h3>
+                        <span style='background-color: {('#10B981' if post['status'].lower() == 'completed' else '#3B82F6')}; color: white; padding: 5px 10px; border-radius: 15px; font-size: 0.8em;'>{post['status'].upper()}</span>
+                    </div>
+                    <div style='margin-bottom: 15px;'>
+                        <strong style='color: var(--text-color);'>Title:</strong>
+                        <div style='font-size: 1.1em; margin-top: 5px; color: var(--text-color);'>{post.get('title', 'Untitled')}</div>
+                    </div>
+                    <div style='background-color: var(--background-color); border: 1px solid var(--primary-color); border-radius: 5px; padding: 15px; margin-bottom: 10px; color: var(--text-color);'>
+                        {post['content'].replace('\n', '<br>')}
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
+    
+    # Switch columns for next post
+    current_col = col2 if current_col == col1 else col1
