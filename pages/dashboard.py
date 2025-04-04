@@ -1,5 +1,7 @@
 import streamlit as st
 import requests
+import pandas as pd
+from io import BytesIO
 
 API_BASE = "https://techlocal-copy.onrender.com"
 
@@ -45,6 +47,34 @@ else:
 # --- View Posts ---
 st.header("Nội dung các bài viết")
 posts = requests.get(f"{API_BASE}/content/campaigns/{campaign_id}/posts").json()
+
+# Add Excel export functionality
+if posts:
+    # Create DataFrame for export
+    df = pd.DataFrame([
+        {
+            'Post ID': post['id'],
+            'Title': post.get('title', 'Untitled'),
+            'Content': post['content'],
+            'Status': post['status']
+        } for post in posts
+    ])
+    
+    # Create Excel file in memory
+    excel_buffer = BytesIO()
+    df.to_excel(excel_buffer, index=False, engine='openpyxl')
+    excel_buffer.seek(0)
+    
+    # Add download button
+    st.download_button(
+        label="📥 Download Posts as Excel",
+        data=excel_buffer,
+        file_name=f"campaign_{campaign_id}_posts.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    st.divider()
+
+# Display posts
 for post in posts:
     with st.container():
         st.markdown(f"### 📝 Post {post['id']}")
